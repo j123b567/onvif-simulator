@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectResources">
+    <resource url="http://www.w3.org/2003/05/soap-envelope" location="" />
+    <resource url="http://www.w3.org/2005/08/addressing" location="https://www.w3.org/2006/03/addressing/ws-addr.xsd" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.6 (onvif-simulator)" project-jdk-type="Python SDK" />
+  <component name="PyCharmProfessionalAdvertiser">
+    <option name="shown" value="true" />
+  </component>
+</project>

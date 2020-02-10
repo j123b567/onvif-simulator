@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+                   xmlns:wsa5="http://www.w3.org/2005/08/addressing"
+                   xmlns:tt="http://www.onvif.org/ver10/schema"
+                   xmlns:tptz="http://www.onvif.org/ver20/ptz/wsdl"
+>
+    <SOAP-ENV:Body>
+        <tptz:GetPresetsResponse>
+            <tptz:Preset token="preset1">
+                <tt:Name>GHC</tt:Name>
+                <tt:PTZPosition>
+                    <tt:PanTilt y="-0.857200027" x="0.435900003"/>
+                    <tt:Zoom x="0"/>
+                </tt:PTZPosition>
+            </tptz:Preset>
+            <tptz:Preset token="preset5">
+                <tt:Name>ABC</tt:Name>
+                <tt:PTZPosition>
+                    <tt:PanTilt y="-0.857200027" x="0.734399974"/>
+                    <tt:Zoom x="0"/>
+                </tt:PTZPosition>
+            </tptz:Preset>
+            <tptz:Preset token="preset6">
+                <tt:Name>DEF</tt:Name>
+                <tt:PTZPosition>
+                    <tt:PanTilt y="-0.765500009" x="0.863300025"/>
+                    <tt:Zoom x="0"/>
+                </tt:PTZPosition>
+            </tptz:Preset>
+        </tptz:GetPresetsResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

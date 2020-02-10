@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://schemas.xmlsoap.org/wsdl/soap12/">
+    <import namespace="http://schemas.xmlsoap.org/wsdl/"/>
+    <element name="binding" type="soap:tBinding"/>
+    <complexType name="tBinding">
+        <complexContent>
+            <extension base="wsdl:tExtensibilityElement">
+                <sequence/>
+                <attribute name="transport" type="anyURI" use="optional"/>
+                <attribute name="style" type="soap:tStyleChoice" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <simpleType name="tStyleChoice">
+        <restriction base="string">
+            <enumeration value="rpc"/>
+            <enumeration value="document"/>
+        </restriction>
+    </simpleType>
+    <element name="operation" type="soap:tOperation"/>
+    <complexType name="tOperation">
+        <complexContent>
+            <extension base="wsdl:tExtensibilityElement">
+                <sequence/>
+                <attribute name="soapAction" type="anyURI" use="optional"/>
+                <attribute name=”soapActionRequired” type=”Boolean” use=”optional”/>
+                <attribute name="style" type="soap:tStyleChoice" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="body" type="soap:tBody"/>
+    <attributeGroup name="tBodyAttributes">
+        <attribute name="encodingStyle" type="anyURI" use="optional"/>
+        <attribute name="use" type="soap:useChoice" use="optional"/>
+        <attribute name="namespace" type="anyURI" use="optional"/>
+    </attributeGroup>
+    <complexType name="tBody">
+        <complexContent>
+            <extension base="wsdl:tExtensibilityElement">
+                <sequence/>
+                <attribute name="parts" type="NMTOKENS" use="optional"/>
+                <attributeGroup ref="soap:tBodyAttributes"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <simpleType name="useChoice">
+        <restriction base="string">
+            <enumeration value="literal"/>
+            <enumeration value="encoded"/>
+        </restriction>
+    </simpleType>
+    <element name="fault" type="soap:tFault"/>
+    <complexType name="tFault">
+        <complexContent>
+            <restriction base="soap:tBody">
+                <sequence/>
+                <attribute ref="wsdl:required" use="optional"/>
+                <attribute name="parts" type="NMTOKENS" use="prohibited"/>
+                <attributeGroup ref="soap:tBodyAttributes"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+    <element name="header" type="soap:tHeader"/>
+    <complexType name="tHeader">
+        <complexContent>
+            <extension base="wsdl:tExtensibilityElement">
+                <sequence>
+                    <element ref="soap:headerfault"/>
+                </sequence>
+                <attribute name="message" type="QName" use="required"/>
+                <attribute name="parts" type="NMTOKENS" use="required"/>
+                <attribute name="use" type="soap:useChoice" use="required"/>
+                <attribute name="encodingStyle" type="anyURI" use="optional"/>
+                <attribute name="namespace" type="anyURI" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="headerfault" type="soap:tHeaderFault"/>
+    <complexType name="tHeaderFault">
+        <attribute name="message" type="QName" use="required"/>
+        <attribute name="parts" type="NMTOKENS" use="required"/>
+        <attribute name="use" type="soap:useChoice" use="required"/>
+        <attribute name="encodingStyle" type="anyURI" use="optional"/>
+        <attribute name="namespace" type="anyURI" use="optional"/>
+    </complexType>
+    <element name="address" type="soap:tAddress"/>
+    <complexType name="tAddress">
+        <complexContent>
+            <extension base="wsdl:tExtensibilityElement">
+                <sequence/>
+                <attribute name="location" type="anyURI" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+</schema>
