@@ -28,10 +28,25 @@ def _get_action(root):
     return action.text
 
 
+def _parse_qname(qname):
+    if qname[:1] == "{":
+        return qname[1:].rsplit("}", 1)
+    else:
+        return None, qname
+
+
 class WsdlQueryHeader:
-    def __init__(self, header):
+    def __init__(self, header, body=None):
         action = header.find(ADDRESSING_ACTION_TAG)
-        self.action = action.text
+        if action is None and body is not None:
+            self.action = '/'.join(_parse_qname(body[0].tag))
+        else:
+            self.action = action.text
+        message_id = header.find(ADDRESSING_MESSAGE_ID_TAG)
+        if message_id is not None:
+            self.message_id = message_id.text
+        else:
+            self.message_id = None
 
 
 def ver10_device_factory(action, body_el):
@@ -63,9 +78,17 @@ class WsdlQuery:
     def __init__(self, data):
         root = ET.fromstring(data)
         header = root.find(SOAP_HEADER_TAG)
-        self.header = WsdlQueryHeader(header)
+        body = root.find(SOAP_BODY_TAG)
 
-        self.body_el = root.find(SOAP_BODY_TAG)
+        self.header = WsdlQueryHeader(header, body)
+
+        self.body_el = body
+
+        security_el = header.find("{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security")
+        if security_el:
+            username_token_el = security_el.find("{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken")
+            username_el = username_token_el.find("{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username")
+            app.logger.info("WsdlQuery(username={})".format(username_el.text))
 
 
 class Debug:
@@ -182,15 +205,17 @@ def _ensure_element(parent, name):
     return el
 
 
-def _compose_response(action, data):
+def _compose_response(data, action=None, message_id=None):
     header_el = _ensure_element(data, SOAP_HEADER_TAG)
 
-    message_id_el = _ensure_element(header_el, ADDRESSING_MESSAGE_ID_TAG)
-    message_id_el.text = uuid.uuid1().urn
+    if message_id is not None:
+        message_id_el = _ensure_element(header_el, ADDRESSING_MESSAGE_ID_TAG)
+        message_id_el.text = message_id
 
-    action_el = _ensure_element(header_el, ADDRESSING_ACTION_TAG)
-    action_el.attrib[SOAP_MUST_UNDERSTAND_ATTR] = 'true'
-    action_el.text = action
+    if action is not None:
+        action_el = _ensure_element(header_el, ADDRESSING_ACTION_TAG)
+        action_el.attrib[SOAP_MUST_UNDERSTAND_ATTR] = 'true'
+        action_el.text = action
 
     reply_to_el = _ensure_element(header_el, ADDRESSING_REPLY_TO_TAG)
     reply_to_el.attrib[SOAP_MUST_UNDERSTAND_ATTR] = 'true'
@@ -207,22 +232,22 @@ def _compose_response(action, data):
 def device_service():
     wsdl = WsdlQuery(request.data)
     response_data = ver10_device_factory(wsdl.header.action, wsdl.body_el).query()
-    return _compose_response(wsdl.header.action, response_data)
+    return _compose_response(response_data, wsdl.header.action, wsdl.header.message_id)
 
 
 @app.route('/onvif/media_service', methods=['POST'])
 def media_service():
     wsdl = WsdlQuery(request.data)
     response_data = ver10_media_factory(wsdl.header.action, wsdl.body_el).query()
-    return _compose_response(wsdl.header.action, response_data)
+    return _compose_response(response_data, wsdl.header.action, wsdl.header.message_id)
 
 
 @app.route('/onvif/ptz_service', methods=['POST'])
 def ptz_service():
     wsdl = WsdlQuery(request.data)
     response_data = ver20_ptz_factory(wsdl.header.action, wsdl.body_el).query()
-    return _compose_response(wsdl.header.action, response_data)
+    return _compose_response(response_data, wsdl.header.action, wsdl.header.message_id)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
